@@ -1,3 +1,3 @@
-const addon = require('../build/Release/addon');
+const libpcap = require('../build/Release/addon');
 
-console.log(addon.hello()); // 'world'
+console.log(libpcap.createSession()); // 'world'
