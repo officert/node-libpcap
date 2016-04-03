@@ -16,7 +16,7 @@ pcap_t* create_session(const char *device);
 void Create_Session(const FunctionCallbackInfo<Value>& args) {
 	Isolate* isolate = args.GetIsolate();
 
-  pcap_t* session = create_session("en0");
+  // pcap_t* session = create_session("en0");
 
 	args.GetReturnValue().Set(String::NewFromUtf8(isolate, "world"));
 }
