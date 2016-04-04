@@ -1,0 +1,18 @@
+// docs for jshint : http://www.jshint.com/docs/
+// options for jshint : http://www.jshint.com/docs/options/
+
+{
+  "node": true,
+  "mocha": true,
+  "esnext": true,
+  "undef": true,
+  "unused": true,
+  "camelcase": true,
+  "bitwise": true,
+  "eqeqeq": true,
+  "freeze": true,
+  "strict": false,
+  "predef": [
+
+  ]
+}

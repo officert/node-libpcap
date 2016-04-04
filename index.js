@@ -1,3 +1,10 @@
-const libpcap = require('./build/Release/addon');
+'use strict';
 
-console.log(libpcap.createSession()); // 'world'
+const addon = require('./build/Release/addon');
+
+const DEVICE_NAME = 'en0';
+
+let session = addon.createSession(DEVICE_NAME);
+
+console.log(session);
+// console.log(session.deviceName);
