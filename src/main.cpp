@@ -1,9 +1,9 @@
 #include <node.h>
 #include <pcap.h>
 
-#include "pcap_session.h"
+#include "node_pcap.h"
 
-namespace node_libpcap {
+namespace node_pcap {
 	using v8::FunctionCallbackInfo;
 	using v8::Local;
 	using v8::Object;
@@ -12,7 +12,7 @@ namespace node_libpcap {
 	void Create_Session(const FunctionCallbackInfo<Value>& args) {
 		v8::Isolate* isolate = args.GetIsolate();
 
-	  //node_pcap::Pcap_Session::Create_Session(args);
+	  //pcap_t* session = node_pcap::Create_Session();
 
 		printf("HELLLLO FROM C++\n");
 
