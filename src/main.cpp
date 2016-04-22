@@ -39,11 +39,7 @@ void Create_Session(const FunctionCallbackInfo<Value>& args) {
 		device_name = std::string(*param1);
 	}
 
-	printf("device_name %s\n", device_name.c_str());
-
 	//pcap_t* session = node_pcap::Create_Session();
-
-	printf("HELLLLO FROM C++\n");
 
 	Local<Object> obj = Object::New(isolate);
 
