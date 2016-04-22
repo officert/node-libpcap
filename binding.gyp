@@ -4,9 +4,14 @@
       "target_name": "addon",
       "sources": [
         "src/main.cpp",
-        "src/node_pcap.h",
-        "src/node_pcap.cpp"
-        ]
+        "src/pcap_session.h",
+        "src/pcap_session.cpp"
+        ],
+       "link_settings": {
+          "libraries": [
+            "-lpcap"
+          ]
+        }
     }
   ]
 }

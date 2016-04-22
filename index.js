@@ -2,9 +2,14 @@
 
 const addon = require('./build/Release/addon');
 
-const DEVICE_NAME = 'en0';
+class NodePcap {
+  lookupDevice() {
+    return addon.lookupDevice();
+  }
 
-let session = addon.createSession(DEVICE_NAME);
+  createSession(deviceName) {
+    return addon.createSession(deviceName);
+  }
+}
 
-console.log(session);
-// console.log(session.deviceName);
+module.exports = new NodePcap();

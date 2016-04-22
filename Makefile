@@ -8,7 +8,7 @@ build: clean
 	node-gyp build;
 
 run:
-	node index.js
+	node test/test.js
 
 clean:
 	rm -rf $(BUILD_DIR)
