@@ -2,14 +2,17 @@
 
 const addon = require('./build/Release/addon');
 
-class NodePcap {
-  lookupDevice() {
-    return addon.lookupDevice();
-  }
+function _lookupDevice() {
+  return addon.lookupDevice();
+}
 
-  createSession(deviceName) {
-    return addon.createSession(deviceName);
+class PcapSession {
+  constructor() {
+    this._session = new addon.PcapSession();
   }
 }
 
-module.exports = new NodePcap();
+module.exports = {
+  lookupDevice: _lookupDevice,
+  PcapSession: PcapSession
+};
