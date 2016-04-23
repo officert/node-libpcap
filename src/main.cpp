@@ -4,13 +4,7 @@
 
 #include "pcap_session.h"
 
-using v8::Exception;
-using v8::FunctionCallbackInfo;
-using v8::Local;
-using v8::Object;
-using v8::Value;
-
-void Lookup_Device(const FunctionCallbackInfo<Value>& args) {
+void Lookup_Device(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	v8::Isolate* isolate = args.GetIsolate();
 
 	char error_buffer[PCAP_ERRBUF_SIZE];
@@ -20,7 +14,7 @@ void Lookup_Device(const FunctionCallbackInfo<Value>& args) {
 	args.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, device_name));
 }
 
-void Create_Session(const FunctionCallbackInfo<Value>& args) {
+void Create_Session(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	v8::Isolate* isolate = args.GetIsolate();
 
 	std::string device_name;
@@ -41,12 +35,12 @@ void Create_Session(const FunctionCallbackInfo<Value>& args) {
 
 	//pcap_t* session = node_pcap::Create_Session();
 
-	Local<Object> obj = Object::New(isolate);
+	v8::Local<v8::Object> obj = v8::Object::New(isolate);
 
 	args.GetReturnValue().Set(obj);
 }
 
-void InitAll(Local<Object> exports, Local<Object> module) {
+void InitAll(v8::Local<v8::Object> exports, v8::Local<v8::Object> module) {
 	NODE_SET_METHOD(exports, "lookupDevice", Lookup_Device);
 	NODE_SET_METHOD(exports, "createSession", Create_Session);
 }
