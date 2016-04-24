@@ -10,6 +10,10 @@ class PcapSession {
   constructor() {
     this._session = new addon.PcapSession();
   }
+
+  open() {
+    this._session.open();
+  }
 }
 
 module.exports = {

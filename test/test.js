@@ -11,3 +11,5 @@ console.log('DEVICE NAME', nodePcap.lookupDevice());
 let session = new nodePcap.PcapSession();
 
 console.log('SESSION', session);
+
+session.open();

@@ -12,9 +12,9 @@ class PcapSession : public node::ObjectWrap {
   private:
     explicit PcapSession();
     ~PcapSession();
-
     static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
     static v8::Persistent<v8::Function> constructor;
+    static void Open(const v8::FunctionCallbackInfo<v8::Value>& args);
 };
 
 #endif
