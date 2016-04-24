@@ -1,4 +1,5 @@
 #include <node.h>
+#include <pcap.h>
 
 #include "pcap_session.h"
 
@@ -43,7 +44,22 @@ void PcapSession::New(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
-  v8::Isolate* isolate = args.GetIsolate();
+	v8::Isolate* isolate = args.GetIsolate();
+
+	char error_buffer[PCAP_ERRBUF_SIZE];
+	char* device_name;
+
+	if (args.Length() == 0) {
+		isolate->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(isolate, "Device name is required")));
+		return;
+	}
+
+	if (!args[0]->IsString()) {
+		isolate->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(isolate, "Device name must be a string")));
+		return;
+	}
+
+	pcap_t* session_handle = pcap_create((char *) device_name, error_buffer);
 
 	printf("%s\n", "HELLLLO");
 }

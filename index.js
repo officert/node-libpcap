@@ -11,8 +11,8 @@ class PcapSession {
     this._session = new addon.PcapSession();
   }
 
-  open() {
-    this._session.open();
+  open(deviceName) {
+    this._session.open(deviceName);
   }
 }
 
