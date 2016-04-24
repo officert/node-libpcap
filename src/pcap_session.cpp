@@ -3,6 +3,8 @@
 
 #include "pcap_session.h"
 
+const char* ToCString(const v8::String::Utf8Value& value);
+
 v8::Persistent<v8::Function> PcapSession::constructor;
 
 PcapSession::PcapSession() {
@@ -58,7 +60,11 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 
 	char error_buffer[PCAP_ERRBUF_SIZE];
 	int num_packets = 200; //TODO: make this not hardcoded
-	v8::Local<v8::String> device_name = args[0]->ToString();
+  v8::String::Utf8Value str(args[0]);
+	const char* device_name = ToCString(str);
+
+	bpf_u_int32 mask; // The netmask of our sniffing device
+	bpf_u_int32 net; // The IP of our sniffing device
 
 	PcapSession* session = ObjectWrap::Unwrap<PcapSession>(args.This());
 
@@ -68,11 +74,40 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 		return;
 	}
 
-	session->pcap_session = pcap_create((char *) &device_name, error_buffer);
+	// get network number and mask associated with capture device
+	if (pcap_lookupnet(device_name, &net, &mask, error_buffer) == -1)
+	{
+		printf("Couldn't get netmask for device %s: %s\n", device_name, error_buffer);
 
-	// pcap_loop(session->pcap_session, num_packets, On_Packet, NULL);
+		net = 0;
+
+		mask = 0;
+	}
+
+	printf("Device: %s\n", device_name);
+	// printf("Filter expression: %s\n", filter_exp);
+	printf("Net: %u\n", net);
+	printf("Mask: %u\n", mask);
+
+	session->pcap_session = pcap_create(device_name, error_buffer);
+
+	printf("%s\n", "PCAP LOOOOOPPPP");
+
+	//TODO: handle error_buffer
+
+	pcap_loop(session->pcap_session, num_packets, PcapSession::On_Packet, NULL);
+
+	pcap_close(session->pcap_session);
+
+	return;
 }
 
-void On_Packet(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {
+void PcapSession::On_Packet(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {
+	printf("%s\n", "HEREEEEEE");
 
+	PcapSession* session = (PcapSession *)args;
+}
+
+const char* ToCString(const v8::String::Utf8Value& value) {
+  return *value ? *value : "<string conversion failed>";
 }
