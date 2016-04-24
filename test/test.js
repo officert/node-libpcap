@@ -10,6 +10,8 @@ console.log('DEVICE NAME', nodePcap.lookupDevice());
 
 let session = new nodePcap.PcapSession();
 
-console.log('SESSION', session);
+session.on(nodePcap.EVENTS.PACKET, packet => {
+  console.log('PACKET RECIEVED', packet);
+});
 
 session.open(deviceName);
