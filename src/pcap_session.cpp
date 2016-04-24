@@ -57,11 +57,22 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	}
 
 	char error_buffer[PCAP_ERRBUF_SIZE];
+	int num_packets = 200; //TODO: make this not hardcoded
 	v8::Local<v8::String> device_name = args[0]->ToString();
 
 	PcapSession* session = ObjectWrap::Unwrap<PcapSession>(args.This());
 
+	if (session == NULL)
+	{
+		isolate->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(isolate, "Error opening pcap session")));
+		return;
+	}
+
 	session->pcap_session = pcap_create((char *) &device_name, error_buffer);
 
-	printf("%s\n", "HELLLLO");
+	// pcap_loop(session->pcap_session, num_packets, On_Packet, NULL);
+}
+
+void On_Packet(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {
+
 }
