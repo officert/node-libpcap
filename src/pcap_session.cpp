@@ -92,7 +92,18 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	printf("Net: %u\n", net);
 	printf("Mask: %u\n", mask);
 
-	session->pcap_session = pcap_create(device_name, error_buffer);
+  const int packet_capture_length = 65536;
+
+  //TODO: figure out whether to use 1) pcap_create or 2) pcap_open_live
+
+  //1)
+  //http://seclists.org/tcpdump/2012/q1/15
+	// session->pcap_session = pcap_create(device_name, error_buffer);
+  //
+  // pcap_activate(session->pcap_session);
+
+  //2)
+  session->pcap_session = pcap_open_live(device_name, packet_capture_length, 1, 1000, error_buffer);
 
 	printf("%s\n", "PCAP LOOOOOPPPP");
 
@@ -108,7 +119,9 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 void PcapSession::On_Packet(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {
 	printf("%s\n", "HEREEEEEE");
 
-	PcapSession* session = (PcapSession *)args;
+	// PcapSession* session = (PcapSession *)args;
+
+  // v8::Local<v8::Function> callback = v8::Local<v8::Function>::Cast(args);
 }
 
 const char* ToCString(const v8::String::Utf8Value& value) {
