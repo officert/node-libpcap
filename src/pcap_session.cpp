@@ -58,6 +58,9 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 		return;
 	}
 
+  //callback function for packets recieved
+  v8::Local<v8::Function> callback = v8::Local<v8::Function>::Cast(args[1]);
+
 	char error_buffer[PCAP_ERRBUF_SIZE];
 	int num_packets = 200; //TODO: make this not hardcoded
   v8::String::Utf8Value str(args[0]);

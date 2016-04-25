@@ -4,7 +4,7 @@ const addon = require('./build/Release/addon');
 const EventEmitter = require('events');
 
 const EVENTS = {
-  PACKET: 'PACKET'
+  PACKET_RECIEVED: 'PACKET_RECIEVED'
 };
 
 function _lookupDevice() {
@@ -19,7 +19,11 @@ class PcapSession extends EventEmitter {
   }
 
   open(deviceName) {
-    this._session.open(deviceName);
+    this._session.open(deviceName, (packet) => {
+      if (packet) {
+        this.emit(EVENTS.PACKET_RECIEVED, packet);
+      }
+    });
   }
 }
 
