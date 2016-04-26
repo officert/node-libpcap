@@ -13,6 +13,11 @@ PcapSession::PcapSession() {
 PcapSession::~PcapSession() {
 }
 
+struct Callback {
+	v8::Local<v8::Function> callback;
+	v8::Isolate* isolate;
+};
+
 void PcapSession::Init(v8::Local<v8::Object> exports) {
 	v8::Isolate* isolate = exports->GetIsolate();
 
@@ -58,12 +63,14 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 		return;
 	}
 
-  //callback function for packets recieved
-  v8::Local<v8::Function> callback = v8::Local<v8::Function>::Cast(args[1]);
+	//callback function for packets recieved
+	Callback callback;
+	callback.isolate = isolate;
+	callback.callback = v8::Local<v8::Function>::Cast(args[1]);
 
 	char error_buffer[PCAP_ERRBUF_SIZE];
 	int num_packets = 200; //TODO: make this not hardcoded
-  v8::String::Utf8Value str(args[0]);
+	v8::String::Utf8Value str(args[0]);
 	const char* device_name = ToCString(str);
 
 	bpf_u_int32 mask; // The netmask of our sniffing device
@@ -92,38 +99,38 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	printf("Net: %u\n", net);
 	printf("Mask: %u\n", mask);
 
-  const int packet_capture_length = 65536;
+	const int packet_capture_length = 65536;
 
-  //TODO: figure out whether to use 1) pcap_create or 2) pcap_open_live
+	//TODO: figure out whether to use 1) pcap_create or 2) pcap_open_live
 
-  //1)
-  //http://seclists.org/tcpdump/2012/q1/15
+	//1)
+	//http://seclists.org/tcpdump/2012/q1/15
 	// session->pcap_session = pcap_create(device_name, error_buffer);
-  //
-  // pcap_activate(session->pcap_session);
+	//
+	// pcap_activate(session->pcap_session);
 
-  //2)
-  session->pcap_session = pcap_open_live(device_name, packet_capture_length, 1, 1000, error_buffer);
-
-	printf("%s\n", "PCAP LOOOOOPPPP");
+	//2)
+	session->pcap_session = pcap_open_live(device_name, packet_capture_length, 1, 1000, error_buffer);
 
 	//TODO: handle error_buffer
 
-	pcap_loop(session->pcap_session, num_packets, PcapSession::On_Packet, NULL);
+	pcap_loop(session->pcap_session, num_packets, PcapSession::On_Packet, (unsigned char *)&callback);
 
 	pcap_close(session->pcap_session);
 
 	return;
 }
 
-void PcapSession::On_Packet(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {
-	printf("%s\n", "HEREEEEEE");
+void PcapSession::On_Packet(unsigned char* args, const struct pcap_pkthdr *header, const unsigned char *packet) {
+	Callback* callback = (Callback *)(args);
 
-	// PcapSession* session = (PcapSession *)args;
+	const unsigned argc = 1;
 
-  // v8::Local<v8::Function> callback = v8::Local<v8::Function>::Cast(args);
+	v8::Local<v8::Value> argv[argc] = { v8::String::NewFromUtf8(callback->isolate, "hello world") };
+
+	callback->callback->Call(Null(callback->isolate), argc, argv);
 }
 
 const char* ToCString(const v8::String::Utf8Value& value) {
-  return *value ? *value : "<string conversion failed>";
+	return *value ? *value : "<string conversion failed>";
 }
