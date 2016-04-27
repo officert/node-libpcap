@@ -2,7 +2,7 @@
 #include <iostream>
 #include <pcap.h>
 
-#include "pcap_session.h"
+#include "pcapSession.h"
 
 void Lookup_Device(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	v8::Isolate* isolate = args.GetIsolate();

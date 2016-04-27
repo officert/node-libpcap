@@ -4,8 +4,8 @@
       "target_name": "addon",
       "sources": [
         "src/main.cpp",
-        "src/pcap_session.h",
-        "src/pcap_session.cpp",
+        "src/pcapSession.h",
+        "src/pcapSession.cpp",
         "src/structs.h"
         ],
        "link_settings": {

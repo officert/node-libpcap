@@ -3,7 +3,7 @@
 #include <vector>
 #include <net/ethernet.h>
 
-#include "pcap_session.h"
+#include "pcapSession.h"
 #include "structs.h"
 
 const char* ToCString(const v8::String::Utf8Value& value);
