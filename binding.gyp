@@ -5,7 +5,8 @@
       "sources": [
         "src/main.cpp",
         "src/pcap_session.h",
-        "src/pcap_session.cpp"
+        "src/pcap_session.cpp",
+        "src/structs.h"
         ],
        "link_settings": {
           "libraries": [

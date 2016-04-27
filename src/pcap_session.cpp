@@ -2,6 +2,7 @@
 #include <pcap.h>
 
 #include "pcap_session.h"
+#include "structs.h"
 
 const char* ToCString(const v8::String::Utf8Value& value);
 
@@ -12,11 +13,6 @@ PcapSession::PcapSession() {
 
 PcapSession::~PcapSession() {
 }
-
-struct Callback {
-	v8::Local<v8::Function> callback;
-	v8::Isolate* isolate;
-};
 
 void PcapSession::Init(v8::Local<v8::Object> exports) {
 	v8::Isolate* isolate = exports->GetIsolate();
@@ -64,7 +60,7 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	}
 
 	//callback function for packets recieved
-	Callback callback;
+	CallbackInfo callback;
 	callback.isolate = isolate;
 	callback.callback = v8::Local<v8::Function>::Cast(args[1]);
 
@@ -122,13 +118,13 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 void PcapSession::On_Packet(unsigned char* args, const struct pcap_pkthdr *header, const unsigned char *packet) {
-	Callback* callback = (Callback *)(args);
 
-	const unsigned argc = 1;
+	CallbackInfo* callback = (CallbackInfo *)(args);
+	const unsigned argc1 = 1;
 
-	v8::Local<v8::Value> argv[argc] = { v8::String::NewFromUtf8(callback->isolate, "hello world") };
+	v8::Local<v8::Value> argv[argc1] = { v8::String::NewFromUtf8(callback->isolate, "hello world") };
 
-	callback->callback->Call(Null(callback->isolate), argc, argv);
+	callback->callback->Call(Null(callback->isolate), argc1, argv);
 }
 
 const char* ToCString(const v8::String::Utf8Value& value) {
