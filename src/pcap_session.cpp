@@ -1,5 +1,7 @@
 #include <node.h>
 #include <pcap.h>
+#include <vector>
+#include <net/ethernet.h>
 
 #include "pcap_session.h"
 #include "structs.h"
@@ -118,13 +120,38 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 void PcapSession::On_Packet(unsigned char* args, const struct pcap_pkthdr *header, const unsigned char *packet) {
+	static int count = 1; //packet counter
+	static std::vector<MacAddress> mac_addresses;
+	const int ethernet_size = 14; //ethernet headers are always 14 bytes long
+
+	const struct EthernetHeader *ethernet_header; /* The Ethernet header */
+	const struct IpHeader *ip_header; /* The IP header */
+
+	count++;
+
+	ethernet_header = (struct EthernetHeader*)(packet);
+	ip_header = (struct IpHeader*)(packet + ethernet_size);
+
+	// ---------------------------- //
+
+	char* src_mac_address = ether_ntoa((ether_addr *)&ethernet_header->src_address);
+	char* dest_mac_address = ether_ntoa((ether_addr *)&ethernet_header->dest_address);
+
+	// ---------------------------- //
+	// callback
+	// ---------------------------- //
 
 	CallbackInfo* callback = (CallbackInfo *)(args);
-	const unsigned argc1 = 1;
+	const int argc = 1;
 
-	v8::Local<v8::Value> argv[argc1] = { v8::String::NewFromUtf8(callback->isolate, "hello world") };
+	v8::Local<v8::Value> argv[2] = {
+		v8::String::NewFromUtf8(callback->isolate, src_mac_address),
+		v8::String::NewFromUtf8(callback->isolate, dest_mac_address)
+	};
 
-	callback->callback->Call(Null(callback->isolate), argc1, argv);
+	callback->callback->Call(Null(callback->isolate), argc, argv);
+
+	return;
 }
 
 const char* ToCString(const v8::String::Utf8Value& value) {
