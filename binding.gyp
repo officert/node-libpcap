@@ -6,7 +6,8 @@
         "src/main.cpp",
         "src/pcapSession.h",
         "src/pcapSession.cpp",
-        "src/structs.h"
+        "src/structs.h",
+        "src/callbackInfo.h"
         ],
        "link_settings": {
           "libraries": [

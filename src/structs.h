@@ -45,9 +45,4 @@ struct IpHeader {
 	struct IpAddress destAddress; // dest address
 };
 
-struct CallbackInfo {
-	v8::Local<v8::Function> callback;
-	v8::Isolate* isolate;
-};
-
 #endif

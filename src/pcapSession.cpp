@@ -5,6 +5,7 @@
 
 #include "pcapSession.h"
 #include "structs.h"
+#include "callbackInfo.h"
 
 const char* ToCString(const v8::String::Utf8Value& value);
 
