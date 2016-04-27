@@ -24,8 +24,8 @@ struct MacAddress {
 
 /* Ethernet header */
 struct EthernetHeader {
-  struct MacAddress dest_address;
-  struct MacAddress src_address;
+  struct MacAddress destAddress;
+  struct MacAddress srcAddress;
 	// u_char destination_host[ETHER_ADDR_LEN]; /* Destination host address */
 	// u_char source_host[ETHER_ADDR_LEN]; /* Source host address */
 	//u_short type; /* IP? ARP? RARP? etc */
@@ -41,8 +41,8 @@ struct IpHeader {
 	u_char ip_ttl;		/* time to live */
 	u_char ip_p;		/* protocol */
 	u_short ip_sum;		/* checksum */
-	struct IpAddress src_address; // source address
-	struct IpAddress dest_address; // dest address
+	struct IpAddress srcAddress; // source address
+	struct IpAddress destAddress; // dest address
 };
 
 struct CallbackInfo {

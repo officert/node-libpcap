@@ -66,10 +66,10 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	callback.isolate = isolate;
 	callback.callback = v8::Local<v8::Function>::Cast(args[1]);
 
-	char error_buffer[PCAP_ERRBUF_SIZE];
-	int num_packets = 200; //TODO: make this not hardcoded
+	char errorBuffer[PCAP_ERRBUF_SIZE];
+	int numPackets = 200; //TODO: make this not hardcoded
 	v8::String::Utf8Value str(args[0]);
-	const char* device_name = ToCString(str);
+	const char* deviceName = ToCString(str);
 
 	bpf_u_int32 mask; // The netmask of our sniffing device
 	bpf_u_int32 net; // The IP of our sniffing device
@@ -83,59 +83,59 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	}
 
 	// get network number and mask associated with capture device
-	if (pcap_lookupnet(device_name, &net, &mask, error_buffer) == -1)
+	if (pcap_lookupnet(deviceName, &net, &mask, errorBuffer) == -1)
 	{
-		printf("Couldn't get netmask for device %s: %s\n", device_name, error_buffer);
+		printf("Couldn't get netmask for device %s: %s\n", deviceName, errorBuffer);
 
 		net = 0;
 
 		mask = 0;
 	}
 
-	printf("Device: %s\n", device_name);
+	printf("Device: %s\n", deviceName);
 	// printf("Filter expression: %s\n", filter_exp);
 	printf("Net: %u\n", net);
 	printf("Mask: %u\n", mask);
 
-	const int packet_capture_length = 65536;
+	const int packetCaptureLength = 65536;
 
 	//TODO: figure out whether to use 1) pcap_create or 2) pcap_open_live
 
 	//1)
 	//http://seclists.org/tcpdump/2012/q1/15
-	// session->pcap_session = pcap_create(device_name, error_buffer);
+	// session->pcapSession = pcap_create(deviceName, errorBuffer);
 	//
-	// pcap_activate(session->pcap_session);
+	// pcap_activate(session->pcapSession);
 
 	//2)
-	session->pcap_session = pcap_open_live(device_name, packet_capture_length, 1, 1000, error_buffer);
+	session->pcapSession = pcap_open_live(deviceName, packetCaptureLength, 1, 1000, errorBuffer);
 
-	//TODO: handle error_buffer
+	//TODO: handle errorBuffer
 
-	pcap_loop(session->pcap_session, num_packets, PcapSession::On_Packet, (unsigned char *)&callback);
+	pcap_loop(session->pcapSession, numPackets, PcapSession::OnPacket, (unsigned char *)&callback);
 
-	pcap_close(session->pcap_session);
+	pcap_close(session->pcapSession);
 
 	return;
 }
 
-void PcapSession::On_Packet(unsigned char* args, const struct pcap_pkthdr *header, const unsigned char *packet) {
+void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header, const unsigned char *packet) {
 	static int count = 1; //packet counter
-	static std::vector<MacAddress> mac_addresses;
-	const int ethernet_size = 14; //ethernet headers are always 14 bytes long
+	static std::vector<MacAddress> macAddresses;
+	const int ethernetSize = 14; //ethernet headers are always 14 bytes long
 
-	const struct EthernetHeader *ethernet_header; /* The Ethernet header */
+	const struct EthernetHeader *ethernetHeader; /* The Ethernet header */
 	const struct IpHeader *ip_header; /* The IP header */
 
 	count++;
 
-	ethernet_header = (struct EthernetHeader*)(packet);
-	ip_header = (struct IpHeader*)(packet + ethernet_size);
+	ethernetHeader = (struct EthernetHeader*)(packet);
+	ip_header = (struct IpHeader*)(packet + ethernetSize);
 
 	// ---------------------------- //
 
-	char* src_mac_address = ether_ntoa((ether_addr *)&ethernet_header->src_address);
-	char* dest_mac_address = ether_ntoa((ether_addr *)&ethernet_header->dest_address);
+	char* srcMacAddress = ether_ntoa((ether_addr *)&ethernetHeader->srcAddress);
+	char* destMacAddress = ether_ntoa((ether_addr *)&ethernetHeader->destAddress);
 
 	// ---------------------------- //
 	// callback
@@ -145,8 +145,8 @@ void PcapSession::On_Packet(unsigned char* args, const struct pcap_pkthdr *heade
 	const int argc = 1;
 
 	v8::Local<v8::Value> argv[2] = {
-		v8::String::NewFromUtf8(callback->isolate, src_mac_address),
-		v8::String::NewFromUtf8(callback->isolate, dest_mac_address)
+		v8::String::NewFromUtf8(callback->isolate, srcMacAddress),
+		v8::String::NewFromUtf8(callback->isolate, destMacAddress)
 	};
 
 	callback->callback->Call(Null(callback->isolate), argc, argv);
