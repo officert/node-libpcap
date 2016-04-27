@@ -4,8 +4,11 @@
 #include <net/ethernet.h>
 
 #include "pcapSession.h"
-#include "structs.h"
 #include "callbackInfo.h"
+#include "ipAddress.h"
+#include "ipHeader.h"
+#include "macAddress.h"
+#include "ethernetHeader.h"
 
 const char* ToCString(const v8::String::Utf8Value& value);
 

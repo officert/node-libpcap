@@ -6,8 +6,11 @@
         "src/main.cpp",
         "src/pcapSession.h",
         "src/pcapSession.cpp",
-        "src/structs.h",
-        "src/callbackInfo.h"
+        "src/callbackInfo.h",
+        "src/ipAddress.h",
+        "src/ipHeader.h",
+        "src/macAddress.h",
+        "src/ethernetHeader.h"
         ],
        "link_settings": {
           "libraries": [
