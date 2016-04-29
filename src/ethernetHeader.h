@@ -6,6 +6,7 @@
 struct EthernetHeader {
   struct MacAddress destAddress;
   struct MacAddress srcAddress;
+  unsigned short type;
 };
 
 #endif

@@ -19,10 +19,10 @@ class PcapSession extends EventEmitter {
   }
 
   open(deviceName) {
-    this._session.open(deviceName, (srcMacAddress, destMacAddress) => {
+    this._session.open(deviceName, (destMacAddress, srcMacAddress) => {
       this.emit(EVENTS.PACKET_RECIEVED, {
-        srcMacAddress: srcMacAddress,
-        destMacAddress: destMacAddress
+        destMacAddress: destMacAddress,
+        srcMacAddress: srcMacAddress
       });
     });
   }

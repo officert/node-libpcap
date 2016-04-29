@@ -1,6 +1,5 @@
 #include <node.h>
 #include <pcap.h>
-#include <vector>
 #include <net/ethernet.h>
 
 #include "pcapSession.h"
@@ -66,9 +65,9 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	}
 
 	//callback function for packets recieved
-	CallbackInfo callback;
-	callback.isolate = isolate;
-	callback.callback = v8::Local<v8::Function>::Cast(args[1]);
+	CallbackInfo callbackInfo;
+	callbackInfo.isolate = isolate;
+	callbackInfo.callback = v8::Local<v8::Function>::Cast(args[1]);
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
 	int numPackets = 200; //TODO: make this not hardcoded
@@ -116,7 +115,7 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 
 	//TODO: handle errorBuffer
 
-	pcap_loop(session->pcapSession, numPackets, PcapSession::OnPacket, (unsigned char *)&callback);
+	pcap_loop(session->pcapSession, numPackets, PcapSession::OnPacket, (unsigned char *)&callbackInfo);
 
 	pcap_close(session->pcapSession);
 
@@ -124,36 +123,43 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header, const unsigned char *packet) {
-	static int count = 1; //packet counter
-	static std::vector<MacAddress> macAddresses;
+	static int packetCount = 1;
 	const int ethernetSize = 14; //ethernet headers are always 14 bytes long
 
-	const struct EthernetHeader *ethernetHeader; /* The Ethernet header */
-	const struct IpHeader *ip_header; /* The IP header */
+	const struct EthernetHeader *ethernetHeader;
+	const struct IpHeader *ipHeader;
 
-	count++;
+	packetCount++;
 
 	ethernetHeader = (struct EthernetHeader*)(packet);
-	ip_header = (struct IpHeader*)(packet + ethernetSize);
+	ipHeader = (struct IpHeader*)(packet + ethernetSize);
 
 	// ---------------------------- //
 
-	char* srcMacAddress = ether_ntoa((ether_addr *)&ethernetHeader->srcAddress);
-	char* destMacAddress = ether_ntoa((ether_addr *)&ethernetHeader->destAddress);
+	// char* destMacAddress = ether_ntoa((ether_addr *)&ethernetHeader->destAddress);
+	// char* srcMacAddress = ether_ntoa((ether_addr *)&ethernetHeader->srcAddress);
+
+	//TODO figure out why printing the char* version of these messes things up
+	// printf("DEST MAC ADDRESS 1: %s\n", destMacAddress);
+	// printf("DEST MAC ADDRESS 2: %s\n", ether_ntoa((ether_addr *)&ethernetHeader->destAddress));
+	// printf("SRC MAC ADDRESS 1: %s\n", srcMacAddress);
+	// printf("SRC MAC ADDRESS 2: %s\n", ether_ntoa((ether_addr *)&ethernetHeader->srcAddress));
+
+	printf("TYPE : %hu\n", ethernetHeader->type);
 
 	// ---------------------------- //
-	// callback
+	// callbackInfo
 	// ---------------------------- //
 
-	CallbackInfo* callback = (CallbackInfo *)(args);
-	const int argc = 1;
+	CallbackInfo* callbackInfo = (CallbackInfo *)(args);
+	const int argc = 2;
 
-	v8::Local<v8::Value> argv[2] = {
-		v8::String::NewFromUtf8(callback->isolate, srcMacAddress),
-		v8::String::NewFromUtf8(callback->isolate, destMacAddress)
+	v8::Local<v8::Value> argv[argc] = {
+		v8::String::NewFromUtf8(callbackInfo->isolate, ether_ntoa((ether_addr *)&ethernetHeader->destAddress)),
+		v8::String::NewFromUtf8(callbackInfo->isolate, ether_ntoa((ether_addr *)&ethernetHeader->srcAddress))
 	};
 
-	callback->callback->Call(Null(callback->isolate), argc, argv);
+	callbackInfo->callback->Call(Null(callbackInfo->isolate), argc, argv);
 
 	return;
 }
