@@ -146,12 +146,17 @@ void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header
 	// ---------------------------- //
 
 	CallbackInfo* callbackInfo = (CallbackInfo *)(args);
-	const int argc = 3;
+
+	v8::Local<v8::Object> obj = v8::Object::New(callbackInfo->isolate);
+
+	obj->Set(v8::String::NewFromUtf8(callbackInfo->isolate, "deviceName"), v8::String::NewFromUtf8(callbackInfo->isolate, callbackInfo->deviceName.c_str()));
+	obj->Set(v8::String::NewFromUtf8(callbackInfo->isolate, "destAddress"), v8::String::NewFromUtf8(callbackInfo->isolate, formatMacAddress(ethernetHeader->destAddress)));
+	obj->Set(v8::String::NewFromUtf8(callbackInfo->isolate, "srcAddress"), v8::String::NewFromUtf8(callbackInfo->isolate, formatMacAddress(ethernetHeader->srcAddress)));
+
+	const int argc = 1;
 
 	v8::Local<v8::Value> argv[argc] = {
-		v8::String::NewFromUtf8(callbackInfo->isolate, callbackInfo->deviceName.c_str()),
-		v8::String::NewFromUtf8(callbackInfo->isolate, formatMacAddress(ethernetHeader->destAddress)),
-		v8::String::NewFromUtf8(callbackInfo->isolate, formatMacAddress(ethernetHeader->srcAddress))
+		obj
 	};
 
 	callbackInfo->callback->Call(Null(callbackInfo->isolate), argc, argv);
