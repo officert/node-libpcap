@@ -10,9 +10,11 @@
 #include "macAddress.h"
 #include "ethernetHeader.h"
 
+using namespace v8;
+
 char* formatMacAddress(struct MacAddress macAddress);
 
-v8::Persistent<v8::Function> PcapSession::constructor;
+Persistent<Function> PcapSession::constructor;
 
 PcapSession::PcapSession() {
 }
@@ -20,11 +22,11 @@ PcapSession::PcapSession() {
 PcapSession::~PcapSession() {
 }
 
-void PcapSession::Init(v8::Local<v8::Object> exports) {
-	v8::Isolate* isolate = exports->GetIsolate();
+void PcapSession::Init(Local<Object> exports) {
+	Isolate* isolate = exports->GetIsolate();
 
-	v8::Local<v8::FunctionTemplate> tpl = v8::FunctionTemplate::New(isolate, New);
-	tpl->SetClassName(v8::String::NewFromUtf8(isolate, "PcapSession"));
+	Local<FunctionTemplate> tpl = FunctionTemplate::New(isolate, New);
+	tpl->SetClassName(String::NewFromUtf8(isolate, "PcapSession"));
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Prototype
@@ -32,11 +34,11 @@ void PcapSession::Init(v8::Local<v8::Object> exports) {
 
 	constructor.Reset(isolate, tpl->GetFunction());
 
-	exports->Set(v8::String::NewFromUtf8(isolate, "PcapSession"), tpl->GetFunction());
+	exports->Set(String::NewFromUtf8(isolate, "PcapSession"), tpl->GetFunction());
 }
 
-void PcapSession::New(const v8::FunctionCallbackInfo<v8::Value>& args) {
-	v8::Isolate* isolate = args.GetIsolate();
+void PcapSession::New(const FunctionCallbackInfo<Value>& args) {
+	Isolate* isolate = args.GetIsolate();
 
 	if (args.IsConstructCall()) {
 		// Invoked as constructor: `new PcapSession(...)`
@@ -46,33 +48,53 @@ void PcapSession::New(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	} else {
 		// Invoked as plain function `PcapSession(...)`, turn into construct call.
 		const int argc = 1;
-		v8::Local<v8::Value> argv[argc] = { args[0] };
-		v8::Local<v8::Function> cons = v8::Local<v8::Function>::New(isolate, constructor);
+		Local<Value> argv[argc] = { args[0] };
+		Local<Function> cons = Local<Function>::New(isolate, constructor);
 		args.GetReturnValue().Set(cons->NewInstance(argc, argv));
 	}
 }
 
-void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
-	v8::Isolate* isolate = args.GetIsolate();
+void PcapSession::Open(const FunctionCallbackInfo<Value>& args) {
+
+	// javascript function signature:
+	//
+	// /**
+	//  *	@param {String} deviceName
+	//  * @param {Object} options
+	//  * @param {Number} options.packetCount - number of packets to capture
+	//  */
+	// function(deviceName, options) {}
+
+	Isolate* isolate = args.GetIsolate();
 
 	if (args.Length() == 0) {
-		isolate->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(isolate, "Device name is required")));
+		isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Device name is required")));
 		return;
 	}
 
 	if (!args[0]->IsString()) {
-		isolate->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(isolate, "Device name must be a string")));
+		isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Device name must be a string")));
 		return;
 	}
+
+	if (!args[1]->IsObject()) {
+		isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Options must be an object")));
+		return;
+	}
+
+	//get options arg and pull out properties
+	Local<Object> options = args[1]->ToObject();
+
+	Local<Value> packetCount = options->Get(String::NewFromUtf8(isolate, "packetCount"));
+	int numPackets = packetCount->NumberValue();
 
 	//callback function for packets recieved
 	CallbackInfo callbackInfo;
 	callbackInfo.isolate = isolate;
-	callbackInfo.callback = v8::Local<v8::Function>::Cast(args[1]);
+	callbackInfo.callback = Local<Function>::Cast(args[2]);
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
-	int numPackets = 200; //TODO: make this not hardcoded
-	v8::String::Utf8Value str(args[0]);
+	String::Utf8Value str(args[0]);
 	const char* deviceName = *str;
 
 	bpf_u_int32 mask; // The netmask of our sniffing device
@@ -82,7 +104,7 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 
 	if (session == NULL)
 	{
-		isolate->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(isolate, "Error opening pcap session")));
+		isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Error opening pcap session")));
 		return;
 	}
 
@@ -147,15 +169,15 @@ void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header
 
 	CallbackInfo* callbackInfo = (CallbackInfo *)(args);
 
-	v8::Local<v8::Object> obj = v8::Object::New(callbackInfo->isolate);
+	Local<Object> obj = Object::New(callbackInfo->isolate);
 
-	obj->Set(v8::String::NewFromUtf8(callbackInfo->isolate, "deviceName"), v8::String::NewFromUtf8(callbackInfo->isolate, callbackInfo->deviceName.c_str()));
-	obj->Set(v8::String::NewFromUtf8(callbackInfo->isolate, "destAddress"), v8::String::NewFromUtf8(callbackInfo->isolate, formatMacAddress(ethernetHeader->destAddress)));
-	obj->Set(v8::String::NewFromUtf8(callbackInfo->isolate, "srcAddress"), v8::String::NewFromUtf8(callbackInfo->isolate, formatMacAddress(ethernetHeader->srcAddress)));
+	obj->Set(String::NewFromUtf8(callbackInfo->isolate, "deviceName"), String::NewFromUtf8(callbackInfo->isolate, callbackInfo->deviceName.c_str()));
+	obj->Set(String::NewFromUtf8(callbackInfo->isolate, "destMacAddress"), String::NewFromUtf8(callbackInfo->isolate, formatMacAddress(ethernetHeader->destAddress)));
+	obj->Set(String::NewFromUtf8(callbackInfo->isolate, "srcMacAddress"), String::NewFromUtf8(callbackInfo->isolate, formatMacAddress(ethernetHeader->srcAddress)));
 
 	const int argc = 1;
 
-	v8::Local<v8::Value> argv[argc] = {
+	Local<Value> argv[argc] = {
 		obj
 	};
 
