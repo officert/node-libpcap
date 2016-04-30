@@ -1,5 +1,6 @@
 #include <node.h>
 #include <pcap.h>
+#include <string>
 #include <net/ethernet.h>
 
 #include "pcapSession.h"
@@ -9,7 +10,7 @@
 #include "macAddress.h"
 #include "ethernetHeader.h"
 
-const char* ToCString(const v8::String::Utf8Value& value);
+char* formatMacAddress(struct MacAddress macAddress);
 
 v8::Persistent<v8::Function> PcapSession::constructor;
 
@@ -72,7 +73,7 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 	char errorBuffer[PCAP_ERRBUF_SIZE];
 	int numPackets = 200; //TODO: make this not hardcoded
 	v8::String::Utf8Value str(args[0]);
-	const char* deviceName = ToCString(str);
+	const char* deviceName = *str;
 
 	bpf_u_int32 mask; // The netmask of our sniffing device
 	bpf_u_int32 net; // The IP of our sniffing device
@@ -95,10 +96,12 @@ void PcapSession::Open(const v8::FunctionCallbackInfo<v8::Value>& args) {
 		mask = 0;
 	}
 
-	printf("Device: %s\n", deviceName);
-	// printf("Filter expression: %s\n", filter_exp);
-	printf("Net: %u\n", net);
-	printf("Mask: %u\n", mask);
+	callbackInfo.deviceName = deviceName;
+
+	// printf("Device: %s\n", callbackInfo.deviceName.c_str());
+	// // printf("Filter expression: %s\n", filter_exp);
+	// printf("Net: %u\n", net);
+	// printf("Mask: %u\n", mask);
 
 	const int packetCaptureLength = 65536;
 
@@ -136,15 +139,6 @@ void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header
 
 	// ---------------------------- //
 
-	// char* destMacAddress = ether_ntoa((ether_addr *)&ethernetHeader->destAddress);
-	// char* srcMacAddress = ether_ntoa((ether_addr *)&ethernetHeader->srcAddress);
-
-	//TODO figure out why printing the char* version of these messes things up
-	// printf("DEST MAC ADDRESS 1: %s\n", destMacAddress);
-	// printf("DEST MAC ADDRESS 2: %s\n", ether_ntoa((ether_addr *)&ethernetHeader->destAddress));
-	// printf("SRC MAC ADDRESS 1: %s\n", srcMacAddress);
-	// printf("SRC MAC ADDRESS 2: %s\n", ether_ntoa((ether_addr *)&ethernetHeader->srcAddress));
-
 	printf("TYPE : %hu\n", ethernetHeader->type);
 
 	// ---------------------------- //
@@ -152,11 +146,12 @@ void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header
 	// ---------------------------- //
 
 	CallbackInfo* callbackInfo = (CallbackInfo *)(args);
-	const int argc = 2;
+	const int argc = 3;
 
 	v8::Local<v8::Value> argv[argc] = {
-		v8::String::NewFromUtf8(callbackInfo->isolate, ether_ntoa((ether_addr *)&ethernetHeader->destAddress)),
-		v8::String::NewFromUtf8(callbackInfo->isolate, ether_ntoa((ether_addr *)&ethernetHeader->srcAddress))
+		v8::String::NewFromUtf8(callbackInfo->isolate, callbackInfo->deviceName.c_str()),
+		v8::String::NewFromUtf8(callbackInfo->isolate, formatMacAddress(ethernetHeader->destAddress)),
+		v8::String::NewFromUtf8(callbackInfo->isolate, formatMacAddress(ethernetHeader->srcAddress))
 	};
 
 	callbackInfo->callback->Call(Null(callbackInfo->isolate), argc, argv);
@@ -164,6 +159,13 @@ void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header
 	return;
 }
 
-const char* ToCString(const v8::String::Utf8Value& value) {
-	return *value ? *value : "<string conversion failed>";
+char* formatMacAddress(struct MacAddress macAddress) {
+	static char buffer[18];
+
+	sprintf(buffer, "%02x:%02x:%02x:%02x:%02x:%02x",
+	        macAddress.byte1, macAddress.byte2,
+	        macAddress.byte3, macAddress.byte4,
+	        macAddress.byte5, macAddress.byte6);
+
+	return buffer;
 }
