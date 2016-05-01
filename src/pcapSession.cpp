@@ -154,14 +154,6 @@ void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header
 	ethernetHeader = (struct EthernetHeader*)(packet);
 	ipHeader = (struct IpHeader*)(packet + ethernetSize);
 
-	// ---------------------------- //
-
-	// printf("TYPE : %hu\n", ethernetHeader->type);
-
-	// ---------------------------- //
-	// callbackInfo
-	// ---------------------------- //
-
 	CallbackInfo* callbackInfo = (CallbackInfo *)(args);
 
 	Local<Object> obj = Object::New(callbackInfo->isolate);
