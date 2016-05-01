@@ -13,5 +13,5 @@ session.on(nodePcap.EVENTS.PACKET_RECIEVED, packet => {
 });
 
 session
-  .packetCount(1)
+  .packetCount(30)
   .open(deviceName);

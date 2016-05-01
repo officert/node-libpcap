@@ -120,11 +120,6 @@ void PcapSession::Open(const FunctionCallbackInfo<Value>& args) {
 
 	callbackInfo.deviceName = deviceName;
 
-	// printf("Device: %s\n", callbackInfo.deviceName.c_str());
-	// // printf("Filter expression: %s\n", filter_exp);
-	// printf("Net: %u\n", net);
-	// printf("Mask: %u\n", mask);
-
 	const int packetCaptureLength = 65536;
 
 	//TODO: figure out whether to use 1) pcap_create or 2) pcap_open_live
@@ -161,7 +156,7 @@ void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header
 
 	// ---------------------------- //
 
-	printf("TYPE : %hu\n", ethernetHeader->type);
+	// printf("TYPE : %hu\n", ethernetHeader->type);
 
 	// ---------------------------- //
 	// callbackInfo
