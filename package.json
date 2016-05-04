@@ -1,0 +1,33 @@
+{
+  "name": "node_libpcap",
+  "version": "0.0.1",
+  "description": "Node bindings for libpcap",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "nan": "^2.3.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test",
+    "install": "node-gyp rebuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/officert/node-libpcap.git"
+  },
+  "keywords": [
+    "node",
+    "libpcap",
+    "c++"
+  ],
+  "author": "Tim Officer",
+  "license": "ISC",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/officert/node-libpcap/issues"
+  },
+  "homepage": "https://github.com/officert/node-libpcap#readme"
+}
