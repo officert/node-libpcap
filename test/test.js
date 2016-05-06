@@ -6,12 +6,14 @@ let deviceName = nodePcap.lookupDevice();
 
 if (!deviceName) throw new Error('Error looking up device name');
 
-let session = new nodePcap.PcapSession();
+console.log('deviceName', deviceName);
 
-session.on(nodePcap.EVENTS.PACKET_RECIEVED, packet => {
-  console.log(packet);
-});
+// let session = new nodePcap.PcapSession();
 
-session
-  .packetCount(30)
-  .open(deviceName);
+// session.on(nodePcap.EVENTS.PACKET_RECIEVED, packet => {
+//   console.log(packet);
+// });
+
+// session
+//   .packetCount(30)
+//   .open(deviceName);
