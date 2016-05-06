@@ -2,21 +2,24 @@
 #define PCAP_SESSION
 
 #include <pcap.h>
-#include <node.h>
-#include <node_object_wrap.h>
+#include <nan.h>
 
-class PcapSession : public node::ObjectWrap {
+class PcapSession : public Nan::ObjectWrap {
   public:
-    static void Init(v8::Local<v8::Object> exports);
+    static NAN_MODULE_INIT(Init);
 
   private:
     explicit PcapSession();
     ~PcapSession();
-    pcap_t* pcapSession;
-    static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
-    static v8::Persistent<v8::Function> constructor;
-    static void Open(const v8::FunctionCallbackInfo<v8::Value>& args);
+
+    static Nan::Persistent<v8::Function> constructor;
+
+    static NAN_METHOD(New);
+    // static NAN_METHOD(Open);
+
     static void OnPacket(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet);
+
+    pcap_t* pcapSession;
 };
 
 #endif
