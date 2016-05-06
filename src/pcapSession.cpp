@@ -25,11 +25,11 @@ NAN_MODULE_INIT(PcapSession::Init) {
 
 	tpl->SetClassName(Nan::New("PcapSession").ToLocalChecked());
 
-	// tpl->InstanceTemplate()->SetInternalFieldCount(1);
+	tpl->InstanceTemplate()->SetInternalFieldCount(1);
+	//
+	Nan::SetPrototypeMethod(tpl, "open", Open);
 
-	// Nan::SetPrototypeMethod(tpl, "plusOne", PlusOne);
-
-	// constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+	constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
 
 	Nan::Set(target, Nan::New("PcapSession").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
@@ -78,7 +78,22 @@ NAN_METHOD(PcapSession::New) {
 //              args.GetReturnValue().Set(cons->NewInstance(argc, argv));
 //      }
 // }
-//
+
+NAN_METHOD(PcapSession::Open) {
+	// javascript function signature:
+	//
+	// /**
+	//  *	@param {String} deviceName
+	//  * @param {Object} options
+	//  * @param {Number} options.packetCount - number of packets to capture
+	//  */
+	// function(deviceName, options) {}
+
+	PcapSession* obj = Nan::ObjectWrap::Unwrap<PcapSession>(info.This());
+
+	// info.GetReturnValue().Set(obj->value_);
+}
+
 // void PcapSession::Open(const FunctionCallbackInfo<Value>& args) {
 //
 //      // javascript function signature:

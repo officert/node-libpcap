@@ -15,7 +15,7 @@ class PcapSession : public Nan::ObjectWrap {
     static Nan::Persistent<v8::Function> constructor;
 
     static NAN_METHOD(New);
-    // static NAN_METHOD(Open);
+    static NAN_METHOD(Open);
 
     static void OnPacket(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet);
 
