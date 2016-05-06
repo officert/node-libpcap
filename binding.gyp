@@ -12,6 +12,9 @@
         "src/macAddress.h",
         "src/ethernetHeader.h"
         ],
+       "include_dirs" : [
+          "<!(node -e \"require('nan')\")"
+        ],
        "link_settings": {
           "libraries": [
             "-lpcap"
