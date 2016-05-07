@@ -12,9 +12,9 @@ let session = new nodePcap.PcapSession();
 
 console.log('session', session);
 
-// session.on(nodePcap.EVENTS.PACKET_RECIEVED, packet => {
-//   console.log(packet);
-// });
+session.on(nodePcap.EVENTS.PACKET_RECIEVED, buffer => {
+  // console.log(buffer);
+});
 
 session
   .packetCount(30)

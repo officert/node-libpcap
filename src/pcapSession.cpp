@@ -137,23 +137,31 @@ NAN_METHOD(PcapSession::Open) {
 
 void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header, const unsigned char *packet) {
 	static int packetCount = 1;
-	const int ethernetSize = 14; //ethernet headers are always 14 bytes long
-
-	const struct EthernetHeader *ethernetHeader;
-	const struct IpHeader *ipHeader;
 
 	packetCount++;
 
-	ethernetHeader = (struct EthernetHeader*)(packet);
-	ipHeader = (struct IpHeader*)(packet + ethernetSize);
-
 	CallbackInfo* callbackInfo = (CallbackInfo *)(args);
 
-	printf("CALLBACK\n");
+	unsigned long packetLength = header->caplen;
 
-	v8::Local<v8::Object> obj = Nan::New<v8::Object>();
+	printf("PACKET LENGTH %lu\n", packetLength);
 
-	Nan::Set(obj, Nan::New("deviceName").ToLocalChecked(), Nan::New(callbackInfo->deviceName.c_str()).ToLocalChecked());
+	char* packetData = new char[packetLength];
+
+	memcpy(packetData, packet, packetLength);
+
+	Nan::MaybeLocal<v8::Object> buffer = Nan::NewBuffer(packetData, packetLength);
+
+	const int argc = 1;
+
+	v8::Local<v8::Value> argv[argc] = {
+		// Nan::New("FOOBAR").ToLocalChecked()
+		buffer.ToLocalChecked()
+	};
+
+	Nan::Callback callback(callbackInfo->callback);
+
+	callback.Call(argc, argv);
 
 	return;
 }

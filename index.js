@@ -26,8 +26,9 @@ class PcapSession extends EventEmitter {
   open(deviceName) {
     this._session.open(deviceName, {
       packetCount: this._packetCount
-    }, packet => {
-      this.emit(EVENTS.PACKET_RECIEVED, new Packet(packet));
+    }, buffer => {
+      console.log('PACKET LENGTH - BUFFER', buffer.length)
+      this.emit(EVENTS.PACKET_RECIEVED, buffer);
     });
 
     return this;
