@@ -12,7 +12,7 @@ let session = new nodePcap.PcapSession();
 
 console.log('session', session);
 
-session.on(nodePcap.EVENTS.PACKET_RECIEVED, buffer => {
+session.on(nodePcap.PcapSession.EVENTS.PACKET_RECIEVED, buffer => {
   // console.log(buffer);
 });
 
