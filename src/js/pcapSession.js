@@ -3,6 +3,8 @@
 const addon = require('../../build/Release/addon');
 const EventEmitter = require('events');
 
+const Packet = require('./packet');
+
 const DEFAULT_PACKET_COUNT = 10;
 
 const EVENTS = {
@@ -17,24 +19,37 @@ class PcapSession extends EventEmitter {
     this._packetCount = DEFAULT_PACKET_COUNT;
   }
 
+  /**
+   * @static
+   * @desc enum of events emitted by PcapSession
+   */
   static get EVENTS() {
     return EVENTS;
   }
 
+  /**
+   * @desc open the PcapSession to start packet capture
+   * @param {String} deviceName - device interface name
+   @ @return PcapSession instance
+   */
   open(deviceName) {
     this._session.open(deviceName, {
       packetCount: this._packetCount
     }, buffer => {
-      console.log('PACKET LENGTH - BUFFER', buffer.length);
-      
-      this.emit(EVENTS.PACKET_RECIEVED, buffer);
+      let packet = new Packet(buffer);
+
+      console.log('packet', packet);
+
+      this.emit(EVENTS.PACKET_RECIEVED, packet);
     });
 
     return this;
   }
 
   /**
+   * @desc configure the number of packets to capture
    * @param {Number} count - number of packets to capture
+   @ @return PcapSession instance
    */
   packetCount(count) {
     if (!count) throw new Error('PcapSession - packetCount - count is required');
