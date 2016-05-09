@@ -37,9 +37,6 @@ class PcapSession extends EventEmitter {
       packetCount: this._packetCount
     }, buffer => {
       let packet = new Packet(buffer);
-
-      console.log('packet', packet);
-
       this.emit(EVENTS.PACKET_RECIEVED, packet);
     });
 

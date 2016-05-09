@@ -12,8 +12,8 @@ let session = new nodePcap.PcapSession();
 
 console.log('session', session);
 
-session.on(nodePcap.PcapSession.EVENTS.PACKET_RECIEVED, buffer => {
-  // console.log(buffer);
+session.on(nodePcap.PcapSession.EVENTS.PACKET_RECIEVED, packet => {
+  console.log('packet', packet);
 });
 
 session

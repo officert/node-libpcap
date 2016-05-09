@@ -4,10 +4,6 @@
 
 #include "pcapSession.h"
 #include "callbackInfo.h"
-// #include "ipAddress.h"
-// #include "ipHeader.h"
-// #include "macAddress.h"
-// #include "ethernetHeader.h"
 
 Nan::Persistent<v8::Function> PcapSession::constructor;
 
