@@ -28,34 +28,24 @@ function _formatMacAddress(macAddressStr) {
 }
 
 function _getEtherType(buffer, offset) {
-  console.log('buff len before', buffer.length);
-
-  console.log('offset', offset);
-
-  // let strType = buffer.readUInt16BE(offset, true);
-
-  let strType = buffer.slice(offset, offset + 2).toString('hex');
+  //read 16 bits (2 bytes, which is the size of the etherType)
+  //in big endian order
+  let strType = buffer.readUInt16BE(offset, true);
 
   let type = null;
 
-  console.log('buff len', strType.length);
-
-  console.log('ETHER TYPE - before', strType);
-
   switch (strType) {
-    case '0800':
+    case 0x0800:
       type = ETHER_TYPES.IPV4;
       break;
-    case '8100':
+    case 0x8100:
       type = ETHER_TYPES.IPV6;
       break;
-    case '0806':
+    case 0x0806:
       type = ETHER_TYPES.ARP;
       break;
     default:
   }
-
-  console.log('ETHER TYPE - after', type);
 
   return type;
 }
