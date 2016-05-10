@@ -140,8 +140,6 @@ void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header
 
 	unsigned long packetLength = header->caplen;
 
-	printf("PACKET LENGTH %lu\n", packetLength);
-
 	char* packetData = new char[packetLength];
 
 	memcpy(packetData, packet, packetLength);
