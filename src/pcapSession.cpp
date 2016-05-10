@@ -149,7 +149,6 @@ void PcapSession::OnPacket(unsigned char* args, const struct pcap_pkthdr *header
 	const int argc = 1;
 
 	v8::Local<v8::Value> argv[argc] = {
-		// Nan::New("FOOBAR").ToLocalChecked()
 		buffer.ToLocalChecked()
 	};
 

@@ -9,7 +9,7 @@ if (!deviceName) throw new Error('Error looking up device name');
 let session = new nodePcap.PcapSession();
 
 session.on(nodePcap.PcapSession.EVENTS.PACKET_RECIEVED, packet => {
-  // console.log('packet', packet);
+  console.log('packet', packet);
 });
 
 session
