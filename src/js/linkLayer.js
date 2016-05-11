@@ -11,7 +11,7 @@ class LinkLayer {
     this.destMacAddress = _formatMacAddress(buffer.slice(0, 6).toString('hex'));
     this.srcMacAddress = _formatMacAddress(buffer.slice(6, 12).toString('hex'));
     this.etherType = _getEtherType(buffer, 12);
-    this.networkLayer = new NetWorkLayer(buffer.slice(12));
+    this.networkLayer = new NetWorkLayer(buffer.slice(14));
   }
 }
 
