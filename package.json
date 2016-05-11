@@ -1,5 +1,5 @@
 {
-  "name": "node_libpcap",
+  "name": "libpcap",
   "version": "0.0.1",
   "description": "Node bindings for libpcap",
   "main": "index.js",
