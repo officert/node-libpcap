@@ -3,7 +3,7 @@
 const addon = require('../../build/Release/addon');
 const EventEmitter = require('events');
 
-const packetFactory = require('./packetFactory');
+const Packet = require('./packet');
 
 const DEFAULT_PACKET_COUNT = 10;
 
@@ -36,7 +36,7 @@ class PcapSession extends EventEmitter {
     this._session.open(deviceName, {
       packetCount: this._packetCount
     }, buffer => {
-      let packet = packetFactory.create(buffer);
+      let packet = new Packet(buffer);
 
       this.emit(EVENTS.PACKET_RECIEVED, packet);
     });
