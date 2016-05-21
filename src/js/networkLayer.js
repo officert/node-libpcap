@@ -22,7 +22,7 @@ class NetworkLayer {
     // this.fragmentOffset
 
     this.timeToLive = buffer.slice(8, 9).toString('hex');
-    this.protocol = buffer.slice(9, 10).toString('hex');
+    this.protocol = buffer.readInt8(9, true);
     this.headChecksum = buffer.slice(10, 12).toString('hex');
 
     this.srcIpAddress = _hexToIpAddress(buffer.slice(12, 16).toString('hex'));
