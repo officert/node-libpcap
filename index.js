@@ -4,11 +4,22 @@ const addon = require('./build/Release/addon');
 
 const PcapSession = require('./src/js/pcapSession');
 
-function _lookupDevice() {
-  return addon.lookupDevice();
-}
-
+/**
+ * @module libpcap
+ */
 module.exports = {
-  lookupDevice: _lookupDevice,
+  /**
+   * @desc Look up the default network interface name
+   * @method lookupDevice
+   * @return String
+   */
+  lookupDevice: () => {
+    return addon.lookupDevice();
+  },
+  /**
+   * @desc PcapSession class constructor
+   * @constructor lookupDevice
+   * @return PcapSession instance
+   */
   PcapSession: PcapSession
 };
