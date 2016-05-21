@@ -1,5 +1,6 @@
 'use strict';
 
+const IP_PROTOCOLS = require('./enums/ipProtocols');
 const TransportLayer = require('./transportLayer');
 
 class NetworkLayer {
@@ -22,7 +23,7 @@ class NetworkLayer {
     // this.fragmentOffset
 
     this.timeToLive = buffer.slice(8, 9).toString('hex');
-    this.protocol = buffer.readInt8(9, true);
+    this.protocol = _getProtocolName(buffer.readInt8(9, true));
     this.headChecksum = buffer.slice(10, 12).toString('hex');
 
     this.srcIpAddress = _hexToIpAddress(buffer.slice(12, 16).toString('hex'));
@@ -45,6 +46,25 @@ function _hexToIpAddress(hex) {
   ip = ip.substring(0, ip.length - 1);
 
   return ip;
+}
+
+function _getProtocolName(num) {
+  let protocolName = null;
+
+  switch (num) {
+    case 6:
+      protocolName = IP_PROTOCOLS.TCP;
+      break;
+    case 17:
+      protocolName = IP_PROTOCOLS.UDP;
+      break;
+    case 1:
+      protocolName = IP_PROTOCOLS.ICMP;
+      break;
+    //TODO: lots more protocols here
+  }
+
+  return protocolName;
 }
 
 module.exports = NetworkLayer;
